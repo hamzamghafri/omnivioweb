@@ -8,8 +8,21 @@ const SMTP2GO_API_KEY = process.env.SMTP2GO_API_KEY;
 const SMTP2GO_SENDER = process.env.SMTP2GO_SENDER;
 const CONTACT_TO = process.env.CONTACT_TO;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
+const allowedOrigins =
+  CORS_ORIGIN === "*"
+    ? "*"
+    : CORS_ORIGIN.split(",").map((origin) => origin.trim()).filter(Boolean);
 
-app.use(cors({ origin: CORS_ORIGIN === "*" ? true : CORS_ORIGIN }));
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins === "*") return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("CORS origin not allowed"));
+    },
+  })
+);
 app.use(express.json({ limit: "1mb" }));
 
 const requiredEnvMissing = () => {
