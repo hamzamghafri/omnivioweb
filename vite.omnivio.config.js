@@ -11,8 +11,5 @@ export default defineConfig({
   },
   build: {
     outDir: "dist-omnivio",
-    rollupOptions: {
-      input: "./src/main-omnivio.jsx",
-    },
   },
 });
