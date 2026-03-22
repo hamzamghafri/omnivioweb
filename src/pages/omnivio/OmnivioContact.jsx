@@ -20,9 +20,10 @@ const INQUIRY_TYPES = [
 ];
 
 const OFFICES = [
-  { city: "Montréal", country: "Canada 🇨🇦", address: "1000 De La Gauchetière O, Suite 2400, QC H3B 4W5", phone: "+1 (514) 555-0100", hours: "Mon–Fri 9am–6pm ET", primary: true },
-  { city: "Paris", country: "France 🇫🇷", address: "25 Rue de la Paix, 75002 Paris", phone: "+33 1 55 55 01 00", hours: "Mon–Fri 9am–6pm CET" },
-  { city: "Casablanca", country: "Morocco 🇲🇦", address: "Tour Zénith, Boulevard Sidi Mohamed, 20030", phone: "+212 522 555 010", hours: "Mon–Fri 9am–6pm WET" },
+  { city: "Montréal", country: "Canada 🇨🇦", hours: "Mon–Fri 9am–6pm ET", primary: true },
+  { city: "Paris", country: "France 🇫🇷", hours: "Mon–Fri 9am–6pm CET" },
+  { city: "Casablanca", country: "Morocco 🇲🇦", phone: "+212 663 147 718", hours: "Mon–Fri 9am–6pm WET" },
+  { city: "Dubai", country: "UAE 🇦🇪", hours: "Sat-Thu 9am–6pm GST" },
 ];
 
 export default function OmnivioContact() {
@@ -250,7 +251,7 @@ export default function OmnivioContact() {
                 <Clock className="w-5 h-5 text-blue-600 mb-2" />
                 <p className="font-semibold text-neutral-900 text-sm">Typical response time</p>
                 <p className="text-2xl font-black text-blue-600 mt-0.5">&lt; 2 hours</p>
-                <p className="text-xs text-neutral-500 mt-1">During business hours (ET / CET / WET)</p>
+                <p className="text-xs text-neutral-500 mt-1">During business hours (ET / CET / WET / GST)</p>
               </div>
 
               {/* Offices */}
