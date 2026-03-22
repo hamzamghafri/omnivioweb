@@ -27,7 +27,9 @@ const OFFICES = [
 ];
 
 export default function OmnivioContact() {
-  const CONTACT_API_URL = import.meta.env.VITE_CONTACT_API_URL || "";
+  const CONTACT_API_URL =
+    import.meta.env.VITE_CONTACT_API_URL ||
+    "https://omnivio-contact-api.onrender.com/contact";
   const { lang, setLang, t } = useI18n();
   const [inquiryType, setInquiryType] = useState("demo");
   const [form, setForm] = useState({
@@ -51,10 +53,6 @@ export default function OmnivioContact() {
     setSubmitError("");
     setSubmitting(true);
     try {
-      if (!CONTACT_API_URL) {
-        throw new Error("Missing VITE_CONTACT_API_URL");
-      }
-
       const response = await fetch(CONTACT_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
