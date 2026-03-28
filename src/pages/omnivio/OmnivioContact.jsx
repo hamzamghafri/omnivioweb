@@ -27,9 +27,10 @@ const OFFICES = [
 ];
 
 export default function OmnivioContact() {
-  const CONTACT_API_URL =
-    import.meta.env.VITE_CONTACT_API_URL ||
-    "https://omnivio-contact-api.onrender.com/contact";
+  const SMTP2GO_API_URL = import.meta.env.VITE_SMTP2GO_API_URL || "https://api.smtp2go.com/v3/email/send";
+  const SMTP2GO_API_KEY = import.meta.env.VITE_SMTP2GO_API_KEY || "";
+  const SMTP2GO_SENDER = import.meta.env.VITE_SMTP2GO_SENDER || "";
+  const CONTACT_TO = import.meta.env.VITE_CONTACT_TO || SMTP2GO_SENDER;
   const { lang, setLang, t } = useI18n();
   const [inquiryType, setInquiryType] = useState("demo");
   const [form, setForm] = useState({
@@ -40,6 +41,29 @@ export default function OmnivioContact() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+  const sendViaSmtp2go = async ({ to, subject, textBody, htmlBody }) => {
+    const response = await fetch(SMTP2GO_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-Smtp2go-Api-Key": SMTP2GO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: SMTP2GO_SENDER,
+        to: Array.isArray(to) ? to : [to],
+        subject,
+        text_body: textBody,
+        html_body: htmlBody,
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data?.data?.succeeded === 0) {
+      throw new Error(data?.data?.error || data?.error || "SMTP2GO request failed");
+    }
+  };
 
   const toggleModule = (m) => {
     setForm(prev => ({
@@ -53,19 +77,50 @@ export default function OmnivioContact() {
     setSubmitError("");
     setSubmitting(true);
     try {
-      const response = await fetch(CONTACT_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          inquiry_type: inquiryType,
-        }),
+      if (!SMTP2GO_API_KEY || !SMTP2GO_SENDER || !CONTACT_TO) {
+        throw new Error("SMTP2GO is not configured");
+      }
+
+      const modules = form.modules.join(", ");
+      const leadText = [
+        "New Omnivio contact form submission",
+        "",
+        `Inquiry Type: ${inquiryType}`,
+        `Name: ${form.first_name} ${form.last_name}`,
+        `Email: ${form.email}`,
+        `Company: ${form.company}`,
+        `Job Title: ${form.job_title || ""}`,
+        `Company Size: ${form.company_size || ""}`,
+        `Industry: ${form.industry || ""}`,
+        `Location: ${form.location || ""}`,
+        `Modules: ${modules}`,
+        "",
+        "Message:",
+        form.message || "",
+      ].join("\n");
+
+      await sendViaSmtp2go({
+        to: CONTACT_TO,
+        subject: `New contact request (${inquiryType}) - ${form.company}`,
+        textBody: leadText,
+        htmlBody: `<p><strong>Inquiry Type:</strong> ${inquiryType}</p>
+<p><strong>Name:</strong> ${form.first_name} ${form.last_name}</p>
+<p><strong>Email:</strong> ${form.email}</p>
+<p><strong>Company:</strong> ${form.company}</p>
+<p><strong>Job Title:</strong> ${form.job_title || ""}</p>
+<p><strong>Company Size:</strong> ${form.company_size || ""}</p>
+<p><strong>Industry:</strong> ${form.industry || ""}</p>
+<p><strong>Location:</strong> ${form.location || ""}</p>
+<p><strong>Modules:</strong> ${modules}</p>
+<p><strong>Message:</strong><br/>${(form.message || "").replace(/\n/g, "<br/>")}</p>`,
       });
 
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.ok) {
-        throw new Error(result.error || "Failed to submit contact form");
-      }
+      await sendViaSmtp2go({
+        to: form.email,
+        subject: "Thanks for contacting Omnivio",
+        textBody: `Hi ${form.first_name},\n\nThanks for reaching out to Omnivio. We received your request and will respond within 2 business hours.\n\n- Omnivio Team`,
+        htmlBody: `<p>Hi ${form.first_name},</p><p>Thanks for reaching out to Omnivio. We received your request and will respond within <strong>2 business hours</strong>.</p><p>- Omnivio Team</p>`,
+      });
 
       setSubmitted(true);
     } catch (error) {

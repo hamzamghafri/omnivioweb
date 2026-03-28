@@ -5,25 +5,15 @@ services:
     buildCommand: npm install && npm run build:omnivio
     staticPublishPath: ./dist-omnivio
     envVars:
-      - key: VITE_CONTACT_API_URL
-        value: https://omnivio-contact-api.onrender.com/contact
+      - key: VITE_SMTP2GO_API_KEY
+        sync: false
+      - key: VITE_SMTP2GO_SENDER
+        sync: false
+      - key: VITE_CONTACT_TO
+        sync: false
+      - key: VITE_SMTP2GO_API_URL
+        value: https://api.smtp2go.com/v3/email/send
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
-
-  - type: web
-    name: omnivio-contact-api
-    env: node
-    rootDir: ./server
-    buildCommand: npm install
-    startCommand: npm start
-    envVars:
-      - key: SMTP2GO_API_KEY
-        sync: false
-      - key: SMTP2GO_SENDER
-        sync: false
-      - key: CONTACT_TO
-        sync: false
-      - key: CORS_ORIGIN
-        sync: false
