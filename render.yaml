@@ -5,14 +5,8 @@ services:
     buildCommand: npm install && npm run build:omnivio
     staticPublishPath: ./dist-omnivio
     envVars:
-      - key: VITE_SMTP2GO_API_KEY
-        sync: false
-      - key: VITE_SMTP2GO_SENDER
-        sync: false
-      - key: VITE_CONTACT_TO
-        sync: false
-      - key: VITE_SMTP2GO_API_URL
-        value: https://api.smtp2go.com/v3/email/send
+      - key: VITE_CONTACT_API_URL
+        value: https://omnivio-contact.vercel.app/api/contact
     routes:
       - type: rewrite
         source: /*
