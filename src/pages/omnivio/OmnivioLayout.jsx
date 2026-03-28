@@ -560,10 +560,11 @@ export default function OmnivioLayout({ children, lang, setLang, t }) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
-                <span className="text-white font-black text-sm">O</span>
-              </div>
-              <span className="font-black text-xl tracking-tight text-neutral-900">Omnivio</span>
+              <img
+                src="/omnivio_app_logo.svg"
+                alt="Omnivio"
+                className="h-8 w-auto"
+              />
             </Link>
 
             {/* Desktop nav */}
